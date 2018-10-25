@@ -14,7 +14,7 @@ class CreateTableCackes extends Migration
     public function up()
     {
         Schema::create('cakes', function (Blueprint $table) {
-            $table->string('id', 36)->index()->unique()->change();
+            $table->string('id', 36)->index()->unique();
             $table->string('name');
             $table->string('descriptions');
             $table->unsignedInteger('number');

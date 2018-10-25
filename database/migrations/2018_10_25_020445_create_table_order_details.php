@@ -14,7 +14,7 @@ class CreateTableOrderDetails extends Migration
     public function up()
     {
         Schema::create('order_details', function (Blueprint $table) {
-            $table->string('id', 36)->index()->unique()->change();
+            $table->string('id', 36)->index()->unique();
             $table->unsignedInteger('number');
             $table->unsignedInteger('cost');
             $table->unsignedInteger('price');

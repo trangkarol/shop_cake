@@ -14,7 +14,7 @@ class CreateTablePrices extends Migration
     public function up()
     {
         Schema::create('prices', function (Blueprint $table) {
-            $table->string('id', 36)->index()->unique()->change();
+            $table->string('id', 36)->index()->unique();
             $table->unsignedInteger('price');
             $table->dateTimeTz('start_date');
             $table->dateTimeTz('end_date');
