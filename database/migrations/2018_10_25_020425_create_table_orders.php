@@ -14,8 +14,8 @@ class CreateTableOrders extends Migration
     public function up()
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->string('id', 36)->index()->unique()->change();
-            $table->string('order_code', 15)->unique()->change();
+            $table->string('id', 36)->index()->unique();
+            $table->string('order_code', 15)->unique();
             $table->string('user_id', 36);
             $table->unsignedTinyInteger('status')->default(config('setting.order.status.new'));
             $table->unsignedInteger('total_number');
