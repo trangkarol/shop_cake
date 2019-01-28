@@ -3,7 +3,12 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use App\Exceptions\Api\NotFoundException;
+use App\Exceptions\Api\UnknowException;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Response;
 
 class Handler extends ExceptionHandler
 {
@@ -13,7 +18,7 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
-        //
+        NotFoundException::class,
     ];
 
     /**
@@ -48,6 +53,48 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($exception instanceOf NotFoundException || $exception instanceOf UnknowException) {
+            return $this->failJson($exception->getCode(), $exception->getErrorMessage(), $exception->getDebug());
+        }
+
+        if ($request->expectsJson() && $exception instanceof ValidationException) {
+            return response()->json([
+                'messages' => [],
+                'forceMessage' => [
+                    'message' => 'string',
+                    'link' => $exception->validator->getMessageBag(),
+                ],
+                'debug' => [],
+            ], Response::HTTP_PAYMENT_REQUIRED);
+        }
+
         return parent::render($request, $exception);
+    }
+
+    private function failJson(int $code, $message = [], $debug = [])
+    {
+        $res = [
+            'code' => $code,
+            'message' => $message,
+            'debug' => $debug,
+        ];
+
+        return response()->json($res, $code);
+    }
+
+    /**
+     * Convert an authentication exception into an unauthenticated response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Auth\AuthenticationException  $exception
+     * @return \Illuminate\Http\Response
+     */
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        if ($request->expectsJson()) {
+            return response()->json(['error' => 'Unauthenticated.'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        return redirect()->guest(route('login'));
     }
 }
