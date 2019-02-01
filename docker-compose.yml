@@ -1,0 +1,23 @@
+version: '3'
+services:
+    web:
+        build: .
+        image: shop-cake-web
+        volumes:
+            - ./:/var/www/html
+        ports:
+            - "90:80"
+            - "8890:8890"
+        extra_hosts:
+            - "shop-cacke.local:127.0.0.1"
+        links:
+            - serverdb
+    serverdb:
+        image: mysql:5.7
+        container_name: shop-cake-db
+        volumes:
+          - ./data/mysql:/var/lib/mysql
+        environment:
+          - MYSQL_ROOT_PASSWORD=admin
+        ports:
+          - 3406:3306
