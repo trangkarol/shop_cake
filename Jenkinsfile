@@ -1,10 +1,27 @@
 node {
     currentBuild.result = "SUCCESS"
     try {
-        sh 'rsync -avzhP --delete --exclude=.git/ --exclude=Jenkinsifle $WORKSPACE/ www@10.0.1.234:/root/docker/'
+        stage('Checkout'){
+            checkout scm
+        }
 
-        sh 'ssh www@10.0.1.234 "cd /root/docker/ && bash docker-compose.sh"'
-        //push image to private dockerhub
+        stage("Build Docker"){
+            //build docker & mount source to /var/www/html
+            sh 'DOCKER_HOST=127.0.0.1'
+            //build docker & mount source to /var/www/html
+            sh 'bash $WORKSPACE/docker/docker-compose.sh'
+            sh 'docker-compose down'
+            sh 'docker-compose up -d'
+            docker.image('shopcake_web').inside {
+                sh $USER
+                sh 'composer install'
+                sh 'cp .env.example .env'
+                sh 'php artisan key:generate'
+                sh 'chmod -R 777 storage/ boostrap/cache'
+            }
+            //push image to private dockerhub
+            //....
+        }
     }
     catch (err) {
         currentBuild.result = "FAILURE"
