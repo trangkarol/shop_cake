@@ -6,10 +6,6 @@ interface RepositoryInterface
 {
     public function all();
 
-    public function withTrashed();
-
-    public function onlyTrashed();
-
     public function makeModel();
 
     public function lists($column, $key = null);
